@@ -1,0 +1,18 @@
+{
+  "name": "config-doctor",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c auto \"npm --workspace backend run dev\" \"npm --workspace frontend run dev\"",
+    "build": "npm --workspace backend run build && npm --workspace frontend run build",
+    "start": "npm --workspace backend run start",
+    "lint": "npm --workspace frontend run lint && npm --workspace backend run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}
