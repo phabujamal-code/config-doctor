@@ -42,10 +42,16 @@ app.use(
 
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, service: 'Config Doctor API', timestamp: new Date().toISOString() });
+// ---------- HEALTH CHECK (REQUIRED FOR PROD) ----------
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    ok: true,
+    service: 'Config Doctor API',
+    timestamp: new Date().toISOString(),
+  });
 });
 
+// ---------- API ROUTES ----------
 app.use('/api/analyze', analyzeRoutes);
 
 // Minimal telemetry endpoint (server logs only)
@@ -63,8 +69,7 @@ app.get('/api/premium/checkout', (_req, res) => {
   res.json({ ok: true, checkoutUrl });
 });
 
-// NOTE: This is a temporary "paste license key" activation flow.
-// For production-grade unlock, replace with webhook-driven entitlement checks.
+// NOTE: Temporary license activation flow (MVP)
 app.post('/api/premium/activate', (req, res, next) => {
   try {
     const key = String(req.body?.licenseKey || '').trim();
@@ -98,7 +103,7 @@ app.post('/api/premium/activate', (req, res, next) => {
   }
 });
 
-// Error handler
+// ---------- ERROR HANDLER ----------
 app.use((err, _req, res, _next) => {
   const status = err.statusCode || 500;
   const message = status === 500 ? 'Internal server error' : err.message;
@@ -108,6 +113,7 @@ app.use((err, _req, res, _next) => {
   });
 });
 
+// ---------- START SERVER ----------
 app.listen(PORT, () => {
   console.log(`Config Doctor API listening on http://localhost:${PORT}`);
 });
